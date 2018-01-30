@@ -117,7 +117,7 @@
 				TargetAttributes = {
 					E56B73021E38D39700FC66CB = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = 9UYK4F9BSM;
+						DevelopmentTeam = ES7D9JXTZ2;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -257,7 +257,7 @@
 				ALTERNATE_GROUP = wheel;
 				ALTERNATE_OWNER = root;
 				CODE_SIGN_IDENTITY = "Mac Developer";
-				DEVELOPMENT_TEAM = 9UYK4F9BSM;
+				DEVELOPMENT_TEAM = ES7D9JXTZ2;
 				INFOPLIST_FILE = "$(SRCROOT)/macOSLAPS/Info.plist";
 				INSTALL_GROUP = wheel;
 				INSTALL_OWNER = root;
@@ -275,7 +275,7 @@
 				ALTERNATE_GROUP = wheel;
 				ALTERNATE_OWNER = root;
 				CODE_SIGN_IDENTITY = "Mac Developer";
-				DEVELOPMENT_TEAM = 9UYK4F9BSM;
+				DEVELOPMENT_TEAM = ES7D9JXTZ2;
 				INFOPLIST_FILE = "$(SRCROOT)/macOSLAPS/Info.plist";
 				INSTALL_GROUP = wheel;
 				INSTALL_OWNER = root;

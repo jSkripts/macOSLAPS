@@ -66,3 +66,27 @@ func ad_tools(computer_record: Array<ODRecord>, tool: String, password: String?,
     }
     return(nil)
 }
+
+// Active Directory Tools that will get our expiration time or set a new one
+// and change the password listed in AD
+func ad_tools_change_password(computer_record: Array<ODRecord>, password: String, new_ad_exp_date: String) -> Bool {
+    var success: Bool = true
+    computer_record.forEach { (record) in
+        do {
+            try record.setValue(password, forAttribute: "dsAttrTypeNative:ms-Mcs-AdmPwd")
+        } catch {
+            success = false
+            laps_log.print("There was an error setting the password for this device...", .warn)
+        }
+        
+        do {
+            try record.setValue(new_ad_exp_date, forAttribute: "dsAttrTypeNative:ms-Mcs-AdmPwdExpirationTime")
+        } catch {
+            success = false
+            laps_log.print("There was an error setting the new password expiration for this device...", .warn)
+        }
+    }
+
+    return success
+}
+

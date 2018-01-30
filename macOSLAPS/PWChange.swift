@@ -10,7 +10,10 @@ import Foundation
 import OpenDirectory
 
 func perform_password_change(computer_record: Array<ODRecord>, local_admin: String) {
+    
     laps_log.print("Password Change is required as the LAPS password for " + local_admin + " has expired", .info)
+    laps_log.print("computer_record holds \(computer_record.count) items in password change", .info)
+    
     // Get our configuration variables to prepare for password change
     
     let pass_length = Int(get_config_settings(preference_key: "PasswordLength") as! Int)
@@ -20,11 +23,6 @@ func perform_password_change(computer_record: Array<ODRecord>, local_admin: Stri
     // Generate random password
     let password = generate_random_pw(length: pass_length)
     do {
-        // Pull Local Administrator Record
-        let local_node = try ODNode.init(session: ODSession.default(), type: UInt32(kODNodeTypeLocalNodes))
-        let local_admin_change = try local_node.record(withRecordType: kODRecordTypeUsers, name: local_admin, attributes: nil)
-        // Change the password for the account
-        try local_admin_change.changePassword(nil, toPassword: password)
         // Set out nex expiration date in a variable x days from our
         // configuration variable
         let new_ad_exp_date = time_conversion(time_type: "windows", exp_time: nil, exp_days: exp_days) as! String
@@ -32,12 +30,24 @@ func perform_password_change(computer_record: Array<ODRecord>, local_admin: Stri
         let print_exp_date = time_conversion(time_type: "epoch", exp_time: new_ad_exp_date, exp_days: nil) as! Date
         let formatted_new_exp_date = dateFormatter.string(from: print_exp_date)
         // Change the password in Active Directory
-        _ = ad_tools(computer_record: computer_record, tool: "Set Password", password: password, new_ad_exp_date: new_ad_exp_date)
+        let success = ad_tools_change_password(computer_record: computer_record, password: password, new_ad_exp_date: new_ad_exp_date)
+        guard success else {
+            laps_log.print("Password change has failed on the AD server. I don't know why.", .error)
+            exit(1)
+        }
+        
+        // Pull Local Administrator Record
+        let local_node = try ODNode.init(session: ODSession.default(), type: UInt32(kODNodeTypeLocalNodes))
+        let local_admin_change = try local_node.record(withRecordType: kODRecordTypeUsers, name: local_admin, attributes: nil)
+        // Change the password for the account
+        try local_admin_change.changePassword(nil, toPassword: password)
+       
         laps_log.print("Password change has been completed for local admin " + local_admin + ". New expiration date is " + formatted_new_exp_date, .info)
     } catch {
         laps_log.print("Unable to connect to local directory or change password. Exiting...", .error)
         exit(1)
     }
+    
     if keychain_remove == true {
         let local_admin_path = "/Users/" + local_admin + "/Library/Keychains"
         do {
